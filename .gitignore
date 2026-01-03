@@ -1,11 +1,23 @@
-# Ignore everything by default
-*
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Allow git metadata
-!.gitignore
+# Tauri / Rust
+src-tauri/target/
+src-tauri/Cargo.lock
 
-# Allow src folder and its contents
-!src/
-!src/**
+# Build output
+dist/
+build/
 
-# !README.md
+# Environment
+.env
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
