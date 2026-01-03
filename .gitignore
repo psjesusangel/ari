@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Allow git metadata
+!.gitignore
+
+# Allow src folder and its contents
+!src/
+!src/**
+
+# !README.md

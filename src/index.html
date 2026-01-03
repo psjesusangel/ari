@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ari</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app" id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-mark">Ari</div>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar (⌘B)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="11 17 6 12 11 7"></polyline>
+            <polyline points="18 17 13 12 18 7"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span>Habits</span>
+          <button class="icon-btn icon-btn-sm" onclick="app.openNewHabitModal()" title="New habit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="habit-list" id="habitList"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-header">
+          <span>Views</span>
+        </div>
+        <nav class="nav-list">
+          <a class="nav-item active" data-view="grid" onclick="app.setView('grid')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Grid</span>
+          </a>
+          <a class="nav-item" data-view="today" onclick="app.setView('today')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Today</span>
+          </a>
+          <a class="nav-item" data-view="stats" onclick="app.setView('stats')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Stats</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" onclick="app.openSettings()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+          <span>Settings</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main" id="main">
+      <!-- Grid View -->
+      <div class="view view-grid active" id="viewGrid">
+        <header class="view-header">
+          <div class="view-title">
+            <h1>Habit Grid</h1>
+            <p class="subtitle" id="dateRangeDisplay">Tracking your daily progress</p>
+          </div>
+          <div class="view-actions">
+            <div class="zoom-controls">
+              <button class="icon-btn" onclick="app.zoomOut()" title="Zoom out">
+                <svg width="16" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </button>
+              <span class="zoom-level" id="zoomLevel">100%</span>
+              <button class="icon-btn" onclick="app.zoomIn()" title="Zoom in">
+                <svg width="16" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </button>
+            </div>
+            <button class="btn btn-secondary" onclick="app.resetView()" title="Reset view (⌘0)">
+              <svg width="14" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+              Recenter
+            </button>
+          </div>
+        </header>
+
+        <!-- Canvas Container - the infinite space -->
+        <div class="canvas-container" id="canvasContainer">
+          <div class="canvas-world" id="canvasWorld">
+            <svg class="habit-grid" id="habitGrid"></svg>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="grid-empty" id="gridEmpty">
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <path d="M3 9h18"></path>
+                <path d="M9 21V9"></path>
+              </svg>
+            </div>
+            <h3>No habits yet</h3>
+            <p>Start building better habits today. Create your first habit to begin tracking.</p>
+            <button class="btn btn-primary" onclick="app.openNewHabitModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Create your first habit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today View -->
+      <div class="view view-today" id="viewToday">
+        <header class="view-header">
+          <div class="view-title">
+            <div class="date-nav" id="todayTitle"></div>
+            <p class="subtitle" id="todayDate"></p>
+          </div>
+        </header>
+        <div class="today-content" id="todayContent">
+          <div class="today-progress" id="todayProgress"></div>
+          <div class="today-habits" id="todayHabits"></div>
+          <div class="today-note">
+            <label class="form-label">Daily Note</label>
+            <textarea class="form-textarea" id="todayNote"
+              placeholder="How was your day? Any reflections..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats View -->
+      <div class="view view-stats" id="viewStats">
+        <header class="view-header">
+          <div class="view-title">
+            <h1>Statistics</h1>
+            <p class="subtitle">Your habit tracking overview</p>
+          </div>
+        </header>
+        <div class="stats-content" id="statsContent">
+          <div class="stats-grid" id="statsGrid"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-date"></div>
+      <div class="tooltip-habit"></div>
+      <div class="tooltip-status"></div>
+    </div>
+
+    <!-- New Habit Modal -->
+    <div class="modal-overlay" id="newHabitModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>New Habit</h2>
+          <button class="modal-close" onclick="app.closeModal('newHabitModal')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-input" id="newHabitName" placeholder="e.g., Morning meditation"
+              maxlength="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description <span class="optional">(optional)</span></label>
+            <textarea class="form-textarea" id="newHabitDescription" placeholder="Why is this habit important to you?"
+              maxlength="200"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Frequency</label>
+              <select class="form-select" id="newHabitFrequency">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="flexible">Flexible</option>
+              </select>
+            </div>
+            <div class="form-group" id="newHabitTargetGroup" style="display: none;">
+              <label class="form-label">Times per week</label>
+              <input type="number" class="form-input" id="newHabitTarget" min="1" max="7" value="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-input" id="newHabitStartDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <div class="color-picker" id="newHabitColors"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="app.closeModal('newHabitModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="app.createHabit()">Create Habit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Habit Modal -->
+    <div class="modal-overlay" id="editHabitModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Edit Habit</h2>
+          <button class="modal-close" onclick="app.closeModal('editHabitModal')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-input" id="editHabitName" maxlength="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description <span class="optional">(optional)</span></label>
+            <textarea class="form-textarea" id="editHabitDescription" maxlength="200"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Frequency</label>
+              <select class="form-select" id="editHabitFrequency">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="flexible">Flexible</option>
+              </select>
+            </div>
+            <div class="form-group" id="editHabitTargetGroup" style="display: none;">
+              <label class="form-label">Times per week</label>
+              <input type="number" class="form-input" id="editHabitTarget" min="1" max="7" value="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="editHabitStatus">
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <div class="color-picker" id="editHabitColors"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="modal-footer-left">
+            <button class="btn btn-ghost" onclick="app.archiveHabit()">Archive</button>
+            <button class="btn btn-danger" onclick="app.deleteHabit()">Delete</button>
+          </div>
+          <button class="btn btn-secondary" onclick="app.closeModal('editHabitModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="app.saveHabit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <h2>Settings</h2>
+          <button class="modal-close" onclick="app.closeModal('settingsModal')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-section">
+            <h3>Appearance</h3>
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Theme</h4>
+                <p>Choose your preferred color scheme</p>
+              </div>
+              <select class="form-select" id="settingTheme" onchange="app.setTheme(this.value)">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Accent Color</h4>
+                <p>Primary color for highlights and actions</p>
+              </div>
+              <div class="color-picker color-picker-sm" id="accentColors"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h3>Grid</h3>
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Cell Size</h4>
+                <p>Size of each day's box in the grid</p>
+              </div>
+              <select class="form-select" id="settingCellSize" onchange="app.setCellSize(this.value)">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Timeline Window</h4>
+                <p>Number of days visible in the grid</p>
+              </div>
+              <select class="form-select" id="settingDays" onchange="app.setDaysToShow(this.value)">
+                <option value="90">3 months</option>
+                <option value="180">6 months</option>
+                <option value="365" selected>1 year</option>
+                <option value="730">2 years</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h3>Data</h3>
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Export Data</h4>
+                <p>Download all your habits and logs as JSON</p>
+              </div>
+              <button class="btn btn-secondary" onclick="app.exportData()">Export</button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Clear All Data</h4>
+                <p>Permanently delete all habits and tracking data</p>
+              </div>
+              <button class="btn btn-danger" onclick="app.clearAllData()">Clear Data</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="quote">
+            <em>"We are what we repeatedly do. Excellence, then, is not an act, but a habit."</em>
+            <span>— Aristotle</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h2 id="confirmTitle">Confirm</h2>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage">Are you sure?</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="app.closeModal('confirmModal')">Cancel</button>
+          <button class="btn btn-danger" id="confirmAction">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

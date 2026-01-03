@@ -1,0 +1,1283 @@
+/* ============================================
+   CSS Variables & Theme
+   ============================================ */
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f5;
+  --bg-tertiary: #f1f1ef;
+  --bg-hover: #ebebea;
+  --bg-active: #e3e3e1;
+  --bg-canvas: #fafaf9;
+
+  --text-primary: #37352f;
+  --text-secondary: #6b6b6b;
+  --text-tertiary: #9b9a97;
+  --text-placeholder: #c4c4c4;
+
+  --border-color: #e9e9e7;
+  --border-strong: #d4d4d2;
+
+  --accent: #6366f1;
+  --accent-hover: #5558e3;
+  --accent-light: #eef2ff;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --cell-empty: #ebedf0;
+  --cell-filled: var(--accent);
+
+  --sidebar-width: 240px;
+  --header-height: 64px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", Menlo, monospace;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+
+  --transition-fast: 0.1s ease;
+  --transition-normal: 0.2s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #191919;
+  --bg-secondary: #202020;
+  --bg-tertiary: #2f2f2f;
+  --bg-hover: #333333;
+  --bg-active: #404040;
+  --bg-canvas: #1a1a1a;
+
+  --text-primary: #ebebeb;
+  --text-secondary: #9b9b9b;
+  --text-tertiary: #6b6b6b;
+  --text-placeholder: #5a5a5a;
+
+  --border-color: #333333;
+  --border-strong: #444444;
+
+  --accent-light: #2d2d4d;
+  --cell-empty: #2a2a2a;
+}
+
+/* ============================================
+   Reset & Base
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* ============================================
+   Layout
+   ============================================ */
+
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ============================================
+   Sidebar with Collapsible Navigation Rail
+   ============================================ */
+
+.sidebar {
+  position: relative;
+  width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width var(--transition-smooth);
+  z-index: 10;
+  overflow-x: hidden;
+}
+
+.sidebar.collapsed {
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  overflow: hidden;
+  /* Prevent horizontal scrolling */
+}
+
+/* Lock icon buttons to rail width */
+.sidebar.collapsed .habit-item,
+.sidebar.collapsed .nav-item,
+.sidebar.collapsed .section-header {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sidebar.collapsed .habit-item,
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ensure habit dots stay centered when collapsed */
+.sidebar.collapsed .habit-item .habit-dot {
+  margin: 0 auto;
+}
+
+/* --------------------------------------------
+   Header
+   -------------------------------------------- */
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  height: 56px;
+}
+
+/* Center header contents when collapsed */
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.logo-mark {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+/* --------------------------------------------
+   Hide text smoothly (do NOT remove structure)
+   -------------------------------------------- */
+
+.habit-item-name,
+.section-header span,
+.nav-item span,
+.logo-mark {
+  opacity: 1;
+  max-width: 200px;
+  /* Use max-width instead of width for smoother transition */
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity var(--transition-smooth), max-width var(--transition-smooth);
+}
+
+/* Center the "+" button in collapsed rail */
+.sidebar.collapsed .section-header {
+  justify-content: center;
+}
+
+.sidebar.collapsed .section-header button {
+  margin: 0;
+}
+
+.sidebar.collapsed .habit-item-name,
+.sidebar.collapsed .section-header span,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .logo-mark {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+}
+
+/* --------------------------------------------
+   Sections
+   -------------------------------------------- */
+
+.sidebar-section {
+  padding: 8px;
+  transition: padding var(--transition-smooth);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  transition: padding var(--transition-smooth), justify-content var(--transition-smooth);
+  min-height: 28px;
+  /* Consistent height */
+}
+
+/* Reduce horizontal padding in rail mode - use small value instead of 0 for smoother transition */
+.sidebar.collapsed .sidebar-section,
+.sidebar.collapsed .sidebar-footer {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* --------------------------------------------
+   Habit list
+   -------------------------------------------- */
+
+.habit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
+}
+
+.habit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast), padding var(--transition-smooth), gap var(--transition-smooth), justify-content var(--transition-smooth);
+  font-size: 14px;
+  color: var(--text-secondary);
+  min-height: 32px;
+  /* Consistent height for alignment */
+  position: relative;
+  /* For tooltip positioning */
+}
+
+.habit-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.habit-item.paused {
+  opacity: 0.5;
+}
+
+.habit-item.empty {
+  cursor: default;
+  font-size: 13px;
+}
+
+/* Hide empty state text when collapsed */
+.sidebar.collapsed .habit-item.empty {
+  display: none;
+}
+
+.habit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Rail items */
+.sidebar.collapsed .habit-item,
+.sidebar.collapsed .nav-item {
+  width: 100%;
+  padding: 8px 0;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  /* Remove gap when collapsed since text is hidden */
+}
+
+/* Section headers (e.g. + button) */
+.sidebar.collapsed .section-header {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Tooltip for habits (rail mode) */
+.sidebar.collapsed .habit-item::after {
+  content: attr(data-name);
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.sidebar.collapsed .habit-item:hover::after {
+  opacity: 1;
+}
+
+/* --------------------------------------------
+   Nav list
+   -------------------------------------------- */
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast), padding var(--transition-smooth), gap var(--transition-smooth), justify-content var(--transition-smooth);
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  min-height: 32px;
+  /* Consistent height for alignment */
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Center nav icons in rail */
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  gap: 0;
+  padding: 8px 0;
+}
+
+/* --------------------------------------------
+   Footer
+   -------------------------------------------- */
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 8px;
+  border-top: 1px solid var(--border-color);
+  transition: padding var(--transition-smooth);
+}
+
+/* --------------------------------------------
+   Sidebar toggle (single toggle, inline)
+   -------------------------------------------- */
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-toggle svg {
+  transition: transform var(--transition-smooth);
+}
+
+/* Rotate chevron when collapsed */
+.sidebar.collapsed .sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+
+.main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+  transition: margin-left var(--transition-smooth);
+}
+
+.view {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.view.active {
+  display: flex;
+}
+
+.view-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 12px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.view-title h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 2px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.view-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+/* Ensure all zoom control buttons have same dimensions */
+.zoom-controls .icon-btn {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.zoom-level {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  min-width: 44px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   Canvas - Infinite Space
+   ============================================ */
+
+.canvas-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-canvas);
+  cursor: grab;
+  background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+  display: block;
+}
+
+.canvas-container:active {
+  cursor: grabbing;
+}
+
+.canvas-world {
+  position: absolute;
+  transform-origin: 0 0;
+  will-change: transform;
+  /* No transition - we want immediate response for panning */
+}
+
+.habit-grid {
+  display: block;
+  /* Prevent pixelation at high zoom */
+  shape-rendering: geometricPrecision;
+}
+
+/* Ensure crisp rendering on the SVG elements */
+.habit-grid rect,
+.habit-grid text {
+  shape-rendering: geometricPrecision;
+}
+
+/* Grid Cells */
+.grid-cell {
+  cursor: pointer;
+  transition: filter 0.1s ease, stroke 0.1s ease;
+  fill: var(--cell-empty);
+}
+
+.grid-cell:hover:not(.future) {
+  filter: brightness(1.15);
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.grid-cell.future {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.grid-cell.filled {
+  /* Color set inline */
+}
+
+/* Today ring */
+.today-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+/* Grid typography */
+.grid-label {
+  fill: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.grid-month {
+  fill: var(--text-tertiary);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Today indicator */
+.today-indicator {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  padding: 6px 12px;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Empty state */
+.grid-empty {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: var(--bg-canvas);
+}
+
+.grid-empty.active {
+  display: flex;
+}
+
+.empty-state {
+  text-align: center;
+  max-width: 320px;
+}
+
+.empty-icon {
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* ============================================
+   Today View
+   ============================================ */
+
+.today-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  max-width: 640px;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-nav h1 {
+  margin: 0;
+  min-width: 120px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.date-nav .icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.today-progress {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width var(--transition-normal);
+}
+
+.progress-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.progress-text strong {
+  color: var(--text-primary);
+}
+
+.today-habits {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.today-habit {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.today-habit:hover:not([style*="not-allowed"]) {
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+
+.today-habit:active:not([style*="not-allowed"]) {
+  transform: scale(0.99);
+}
+
+.today-habit.completed {
+  opacity: 0.7;
+}
+
+.today-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.today-habit.completed .today-check {
+  border-color: transparent;
+}
+
+.today-check svg {
+  opacity: 0;
+  color: white;
+  transition: opacity var(--transition-fast);
+}
+
+.today-habit.completed .today-check svg {
+  opacity: 1;
+}
+
+.today-habit-info {
+  flex: 1;
+}
+
+.today-habit-name {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.today-habit.completed .today-habit-name {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.today-habit-meta {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.today-note {
+  margin-top: 20px;
+}
+
+/* ============================================
+   Stats View
+   ============================================ */
+
+.stats-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.stat-name {
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.stat-values {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  filter: brightness(1.1);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.icon-btn-sm {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================
+   Forms
+   ============================================ */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.form-label .optional {
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text-placeholder);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-textarea:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b6b6b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  padding-right: 36px;
+}
+
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.color-picker-sm {
+  gap: 6px;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.selected {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--bg-primary);
+}
+
+.color-picker-sm .color-swatch {
+  width: 24px;
+  height: 24px;
+}
+
+/* ============================================
+   Modals
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(2px);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.95) translateY(10px);
+  transition: transform var(--transition-normal);
+}
+
+.modal-overlay.active .modal {
+  transform: scale(1) translateY(0);
+}
+
+.modal-sm {
+  max-width: 360px;
+}
+
+.modal-lg {
+  max-width: 560px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.modal-footer-left {
+  margin-right: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.quote {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.quote span {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+}
+
+/* ============================================
+   Settings
+   ============================================ */
+
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 24px;
+}
+
+.setting-row:last-child {
+  border-bottom: none;
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-info h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.setting-info p {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.setting-row .form-select {
+  width: auto;
+  min-width: 140px;
+}
+
+/* ============================================
+   Tooltip
+   ============================================ */
+
+.tooltip {
+  position: fixed;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1001;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  box-shadow: var(--shadow-lg);
+}
+
+.tooltip.visible {
+  opacity: 1;
+}
+
+.tooltip-date {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.tooltip-habit {
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.tooltip-status {
+  color: var(--text-tertiary);
+}
