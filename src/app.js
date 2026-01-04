@@ -914,6 +914,49 @@ class AriApp {
     URL.revokeObjectURL(url);
   }
 
+  async importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      if (data.version !== 1) {
+        alert('Unsupported file version');
+        return;
+      }
+      
+      this.showConfirm('Import Data', 'This will merge with your existing data. Continue?', async () => {
+        // Import habits
+        for (const habit of data.habits || []) {
+          await db.updateHabit(habit); // put() works for both insert and update
+        }
+        
+        // Import logs
+        for (const log of data.logs || []) {
+          await db.setLog(log);
+        }
+        
+        // Import notes
+        for (const note of data.notes || []) {
+          await db.setNote(note);
+        }
+        
+        // Reload everything
+        await this.loadHabits();
+        await this.loadAllLogs();
+        await this.loadNotes();
+        this.render();
+        this.closeModal('settingsModal');
+      });
+    } catch (e) {
+      alert('Failed to import: ' + e.message);
+    }
+    
+    event.target.value = ''; // Reset file input
+  }
+
   async clearAllData() {
     this.showConfirm('Clear All Data', 'Permanently delete ALL habits, logs, and notes? This cannot be undone.', async () => {
       await db.clearAll();

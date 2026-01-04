@@ -365,6 +365,14 @@
             <h3>Data</h3>
             <div class="setting-row">
               <div class="setting-info">
+                <h4>Import Data</h4>
+                <p>Load habits and logs from a JSON file</p>
+              </div>
+              <input type="file" id="importFile" accept=".json" style="display:none" onchange="app.importData(event)">
+              <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">Import</button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
                 <h4>Export Data</h4>
                 <p>Download all your habits and logs as JSON</p>
               </div>
@@ -399,7 +407,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="app.closeModal('confirmModal')">Cancel</button>
-          <button class="btn btn-danger" id="confirmAction">Delete</button>
+          <button class="btn btn-danger" id="confirmAction">Continue</button>
         </div>
       </div>
     </div>
