@@ -136,6 +136,13 @@ class AriApp {
     // Today view
     this.viewingDate = null;
     this.sidebarOpen = true;
+
+    // Drag reorder state
+    this.dragHabitId = null;
+    this.dragElement = null;
+    this.dragPlaceholder = null;
+    this.longPressTimer = null;
+    this.longPressDuration = 300; // ms
   }
 
   async init() {
@@ -491,11 +498,172 @@ class AriApp {
       return;
     }
     list.innerHTML = this.habits.map(h => `
-      <div class="habit-item ${h.status === 'paused' ? 'paused' : ''}" onclick="app.openEditHabitModal('${h.id}')">
+      <div class="habit-item ${h.status === 'paused' ? 'paused' : ''}" 
+           data-habit-id="${h.id}"
+           onmousedown="app.handleHabitMouseDown(event, '${h.id}')"
+           onmouseup="app.handleHabitMouseUp(event, '${h.id}')"
+           ontouchstart="app.handleHabitTouchStart(event, '${h.id}')"
+           ontouchend="app.handleHabitTouchEnd(event, '${h.id}')">
+        <div class="habit-drag-handle">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/>
+            <circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/>
+            <circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/>
+          </svg>
+        </div>
         <div class="habit-dot" style="background:${h.color}"></div>
         <span class="habit-item-name">${this.escapeHtml(h.name)}</span>
       </div>
     `).join('');
+  }
+
+  // ============================================
+  // Habit Drag Reorder
+  // ============================================
+
+  handleHabitMouseDown(event, habitId) {
+    if (event.button !== 0) return;
+    this.startLongPress(event, habitId);
+  }
+
+  handleHabitMouseUp(event, habitId) {
+    if (this.dragHabitId) return;
+    this.cancelLongPress();
+    this.openEditHabitModal(habitId);
+  }
+
+  handleHabitTouchStart(event, habitId) {
+    this.startLongPress(event, habitId);
+  }
+
+  handleHabitTouchEnd(event, habitId) {
+    if (this.dragHabitId) return;
+    this.cancelLongPress();
+    this.openEditHabitModal(habitId);
+  }
+
+  startLongPress(event, habitId) {
+    this.cancelLongPress();
+    const target = event.currentTarget;
+    
+    this.longPressTimer = setTimeout(() => {
+      this.startDragReorder(event, habitId, target);
+    }, this.longPressDuration);
+  }
+
+  cancelLongPress() {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+  }
+
+  startDragReorder(event, habitId, element) {
+    if (this.habits.length <= 1) return;
+    
+    event.preventDefault();
+    this.dragHabitId = habitId;
+    
+    const rect = element.getBoundingClientRect();
+    const list = document.getElementById('habitList');
+    
+    // Create placeholder
+    this.dragPlaceholder = document.createElement('div');
+    this.dragPlaceholder.className = 'habit-item drag-placeholder';
+    this.dragPlaceholder.style.height = `${rect.height}px`;
+    element.parentNode.insertBefore(this.dragPlaceholder, element);
+    
+    // Style the dragged element
+    this.dragElement = element;
+    element.classList.add('dragging');
+    element.style.width = `${rect.width}px`;
+    element.style.position = 'fixed';
+    element.style.zIndex = '1000';
+    element.style.pointerEvents = 'none';
+    
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+    element.style.top = `${rect.top}px`;
+    element.style.left = `${rect.left}px`;
+    
+    this.boundDragMove = this.handleDragMove.bind(this);
+    this.boundDragEnd = this.handleDragEnd.bind(this);
+    
+    document.addEventListener('mousemove', this.boundDragMove);
+    document.addEventListener('mouseup', this.boundDragEnd);
+    document.addEventListener('touchmove', this.boundDragMove, { passive: false });
+    document.addEventListener('touchend', this.boundDragEnd);
+  }
+
+  handleDragMove(event) {
+    if (!this.dragHabitId || !this.dragElement) return;
+    
+    event.preventDefault();
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+    
+    const rect = this.dragElement.getBoundingClientRect();
+    this.dragElement.style.top = `${clientY - rect.height / 2}px`;
+    
+    const list = document.getElementById('habitList');
+    const items = Array.from(list.querySelectorAll('.habit-item:not(.dragging):not(.drag-placeholder)'));
+    
+    let insertBefore = null;
+    for (const item of items) {
+      const itemRect = item.getBoundingClientRect();
+      const itemMiddle = itemRect.top + itemRect.height / 2;
+      if (clientY < itemMiddle) {
+        insertBefore = item;
+        break;
+      }
+    }
+    
+    if (insertBefore) {
+      list.insertBefore(this.dragPlaceholder, insertBefore);
+    } else {
+      list.appendChild(this.dragPlaceholder);
+    }
+  }
+
+  async handleDragEnd(event) {
+    if (!this.dragHabitId) return;
+    
+    document.removeEventListener('mousemove', this.boundDragMove);
+    document.removeEventListener('mouseup', this.boundDragEnd);
+    document.removeEventListener('touchmove', this.boundDragMove);
+    document.removeEventListener('touchend', this.boundDragEnd);
+    
+    const list = document.getElementById('habitList');
+    const items = Array.from(list.querySelectorAll('.habit-item:not(.dragging)'));
+    const placeholderIndex = items.indexOf(this.dragPlaceholder);
+    
+    const draggedHabit = this.habits.find(h => h.id === this.dragHabitId);
+    const oldIndex = this.habits.indexOf(draggedHabit);
+    
+    if (placeholderIndex !== -1 && placeholderIndex !== oldIndex) {
+      this.habits.splice(oldIndex, 1);
+      const newIndex = placeholderIndex > oldIndex ? placeholderIndex - 1 : placeholderIndex;
+      this.habits.splice(newIndex, 0, draggedHabit);
+      await this.updateHabitSortOrders();
+    }
+    
+    if (this.dragPlaceholder && this.dragPlaceholder.parentNode) {
+      this.dragPlaceholder.parentNode.removeChild(this.dragPlaceholder);
+    }
+    
+    this.dragHabitId = null;
+    this.dragElement = null;
+    this.dragPlaceholder = null;
+    
+    this.render();
+  }
+
+  async updateHabitSortOrders() {
+    for (let i = 0; i < this.habits.length; i++) {
+      if (this.habits[i].sort_order !== i) {
+        this.habits[i].sort_order = i;
+        this.habits[i].updated_at = new Date().toISOString();
+        await db.updateHabit(this.habits[i]);
+      }
+    }
   }
 
   renderGrid() {
@@ -912,49 +1080,6 @@ class AriApp {
     a.download = `ari-export-${this.formatDate(new Date())}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }
-
-  async importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      
-      if (data.version !== 1) {
-        alert('Unsupported file version');
-        return;
-      }
-      
-      this.showConfirm('Import Data', 'This will merge with your existing data. Continue?', async () => {
-        // Import habits
-        for (const habit of data.habits || []) {
-          await db.updateHabit(habit); // put() works for both insert and update
-        }
-        
-        // Import logs
-        for (const log of data.logs || []) {
-          await db.setLog(log);
-        }
-        
-        // Import notes
-        for (const note of data.notes || []) {
-          await db.setNote(note);
-        }
-        
-        // Reload everything
-        await this.loadHabits();
-        await this.loadAllLogs();
-        await this.loadNotes();
-        this.render();
-        this.closeModal('settingsModal');
-      });
-    } catch (e) {
-      alert('Failed to import: ' + e.message);
-    }
-    
-    event.target.value = ''; // Reset file input
   }
 
   async clearAllData() {

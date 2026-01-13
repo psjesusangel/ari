@@ -1281,3 +1281,52 @@ body {
 .tooltip-status {
   color: var(--text-tertiary);
 }
+
+/* ============================================
+   Habit Drag Reorder 
+   ============================================ */
+
+.habit-item {
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.habit-drag-handle {
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  color: var(--text-tertiary);
+  transition: opacity 0.15s;
+  cursor: grab;
+}
+
+.habit-item:hover .habit-drag-handle {
+  opacity: 0.5;
+}
+
+.habit-item:hover .habit-drag-handle:hover {
+  opacity: 1;
+}
+
+.habit-item.dragging {
+  opacity: 0.9;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: grabbing !important;
+}
+
+.habit-item.drag-placeholder {
+  background: var(--accent);
+  opacity: 0.2;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Adjust habit item padding to make room for drag handle */
+.habit-item:not(.empty) {
+  padding-left: 24px;
+}
